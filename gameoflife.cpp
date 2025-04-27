@@ -1,0 +1,606 @@
+#include <Arduino.h>
+#include <Arduino_LED_Matrix.h>
+#include <Artic.h>
+#include <vector>
+// #include <LedMatrixStartup.h>
+
+ArduinoLEDMatrix matrix;
+
+int ActiveNeighbors = 0;
+
+std::vector<int> UpdateToActiveX;
+std::vector<int> UpdateToActiveY;
+std::vector<int> UpdateToInactiveX;
+std::vector<int> UpdateToInactiveY;
+
+void LedMatrixStartup()
+{
+    uint8_t frame[8][12] = {
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+
+    /*
+        steps[
+            [
+            {0,0,1}
+            {0,11,1}
+            {7 ,0,1}
+            {7 ,11,1}
+            ]
+        ]
+    */
+
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[0][0] = 1;
+    frame[0][11] = 1;
+    frame[7][0] = 1;
+    frame[7][11] = 1;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[0][1] = 1;
+    frame[0][10] = 1;
+    frame[7][1] = 1;
+    frame[7][10] = 1;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[0][0] = 0;
+    frame[0][11] = 0;
+    frame[7][0] = 0;
+    frame[7][11] = 0;
+
+    frame[0][2] = 1;
+    frame[0][9] = 1;
+    frame[7][2] = 1;
+    frame[7][9] = 1;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[0][1] = 0;
+    frame[0][10] = 0;
+    frame[7][1] = 0;
+    frame[7][10] = 0;
+
+    frame[0][3] = 1;
+    frame[0][8] = 1;
+    frame[7][3] = 1;
+    frame[7][8] = 1;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[0][2] = 0;
+    frame[0][9] = 0;
+    frame[7][2] = 0;
+    frame[7][9] = 0;
+
+    frame[0][4] = 1;
+    frame[0][7] = 1;
+    frame[7][4] = 1;
+    frame[7][7] = 1;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[0][3] = 0;
+    frame[0][8] = 0;
+    frame[7][3] = 0;
+    frame[7][8] = 0;
+
+    frame[0][5] = 1;
+    frame[0][6] = 1;
+    frame[7][5] = 1;
+    frame[7][6] = 1;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[0][4] = 0;
+    frame[0][7] = 0;
+    frame[7][4] = 0;
+    frame[7][7] = 0;
+
+    frame[1][5] = 1;
+    frame[1][6] = 1;
+    frame[6][5] = 1;
+    frame[6][6] = 1;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[0][5] = 0;
+    frame[0][6] = 0;
+    frame[7][5] = 0;
+    frame[7][6] = 0;
+
+    frame[2][5] = 1;
+    frame[2][6] = 1;
+    frame[5][5] = 1;
+    frame[5][6] = 1;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[1][5] = 0;
+    frame[1][6] = 0;
+    frame[6][5] = 0;
+    frame[6][6] = 0;
+
+    frame[3][5] = 1;
+    frame[3][6] = 1;
+    frame[4][5] = 1;
+    frame[4][6] = 1;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[2][5] = 0;
+    frame[2][6] = 0;
+    frame[5][5] = 0;
+    frame[5][6] = 0;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[3][5] = 0;
+    frame[3][6] = 0;
+    frame[4][5] = 0;
+    frame[4][6] = 0;
+
+    frame[2][5] = 1;
+    frame[2][6] = 1;
+    frame[3][4] = 1;
+    frame[3][7] = 1;
+    frame[4][4] = 1;
+    frame[4][7] = 1;
+    frame[5][5] = 1;
+    frame[5][6] = 1;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[2][5] = 0;
+    frame[2][6] = 0;
+    frame[3][4] = 0;
+    frame[3][7] = 0;
+    frame[4][4] = 0;
+    frame[4][7] = 0;
+    frame[5][5] = 0;
+    frame[5][6] = 0;
+
+    frame[1][5] = 1;
+    frame[1][6] = 1;
+    frame[2][4] = 1;
+    frame[2][7] = 1;
+    frame[3][3] = 1;
+    frame[3][8] = 1;
+    frame[4][3] = 1;
+    frame[4][8] = 1;
+    frame[5][4] = 1;
+    frame[5][7] = 1;
+    frame[6][5] = 1;
+    frame[6][6] = 1;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[1][5] = 0;
+    frame[1][6] = 0;
+    frame[2][4] = 0;
+    frame[2][7] = 0;
+    frame[3][3] = 0;
+    frame[3][8] = 0;
+    frame[4][3] = 0;
+    frame[4][8] = 0;
+    frame[5][4] = 0;
+    frame[5][7] = 0;
+    frame[6][5] = 0;
+    frame[6][6] = 0;
+
+    frame[0][5] = 1;
+    frame[0][6] = 1;
+    frame[1][4] = 1;
+    frame[1][7] = 1;
+    frame[2][3] = 1;
+    frame[2][8] = 1;
+    frame[3][2] = 1;
+    frame[3][9] = 1;
+    frame[4][2] = 1;
+    frame[4][9] = 1;
+    frame[5][3] = 1;
+    frame[5][8] = 1;
+    frame[6][4] = 1;
+    frame[6][7] = 1;
+    frame[7][5] = 1;
+    frame[7][6] = 1;
+
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[0][5] = 0;
+    frame[0][6] = 0;
+    frame[1][4] = 0;
+    frame[1][7] = 0;
+    frame[2][3] = 0;
+    frame[2][8] = 0;
+    frame[3][2] = 0;
+    frame[3][9] = 0;
+    frame[4][2] = 0;
+    frame[4][9] = 0;
+    frame[5][3] = 0;
+    frame[5][8] = 0;
+    frame[6][4] = 0;
+    frame[6][7] = 0;
+    frame[7][5] = 0;
+    frame[7][6] = 0;
+
+    frame[0][4] = 1;
+    frame[0][7] = 1;
+    frame[1][3] = 1;
+    frame[1][8] = 1;
+    frame[2][2] = 1;
+    frame[2][9] = 1;
+    frame[3][1] = 1;
+    frame[3][10] = 1;
+    frame[4][1] = 1;
+    frame[4][10] = 1;
+    frame[5][2] = 1;
+    frame[5][9] = 1;
+    frame[6][3] = 1;
+    frame[6][8] = 1;
+    frame[7][4] = 1;
+    frame[7][7] = 1;
+
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[0][4] = 0;
+    frame[0][7] = 0;
+    frame[1][3] = 0;
+    frame[1][8] = 0;
+    frame[2][2] = 0;
+    frame[2][9] = 0;
+    frame[3][1] = 0;
+    frame[3][10] = 0;
+    frame[4][1] = 0;
+    frame[4][10] = 0;
+    frame[5][2] = 0;
+    frame[5][9] = 0;
+    frame[6][3] = 0;
+    frame[6][8] = 0;
+    frame[7][4] = 0;
+    frame[7][7] = 0;
+
+    frame[0][3] = 1;
+    frame[0][8] = 1;
+    frame[1][2] = 1;
+    frame[1][9] = 1;
+    frame[2][1] = 1;
+    frame[2][10] = 1;
+    frame[3][0] = 1;
+    frame[3][11] = 1;
+    frame[4][0] = 1;
+    frame[4][11] = 1;
+    frame[5][1] = 1;
+    frame[5][10] = 1;
+    frame[6][2] = 1;
+    frame[6][9] = 1;
+    frame[7][3] = 1;
+    frame[7][8] = 1;
+
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[0][3] = 0;
+    frame[0][8] = 0;
+    frame[1][2] = 0;
+    frame[1][9] = 0;
+    frame[2][1] = 0;
+    frame[2][10] = 0;
+    frame[5][1] = 0;
+    frame[5][10] = 0;
+    frame[6][2] = 0;
+    frame[6][9] = 0;
+    frame[7][3] = 0;
+    frame[7][8] = 0;
+
+    frame[0][2] = 1;
+    frame[0][9] = 1;
+    frame[1][1] = 1;
+    frame[1][10] = 1;
+    frame[2][0] = 1;
+    frame[2][11] = 1;
+    frame[5][0] = 1;
+    frame[5][11] = 1;
+    frame[6][1] = 1;
+    frame[6][10] = 1;
+    frame[7][2] = 1;
+    frame[7][9] = 1;
+
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[0][2] = 0;
+    frame[0][9] = 0;
+    frame[1][1] = 0;
+    frame[1][10] = 0;
+    frame[6][1] = 0;
+    frame[6][10] = 0;
+    frame[7][2] = 0;
+    frame[7][9] = 0;
+
+    frame[0][1] = 1;
+    frame[0][10] = 1;
+    frame[1][0] = 1;
+    frame[1][11] = 1;
+    frame[6][0] = 1;
+    frame[6][11] = 1;
+    frame[7][1] = 1;
+    frame[7][10] = 1;
+
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[0][1] = 0;
+    frame[0][10] = 0;
+    frame[7][1] = 0;
+    frame[7][10] = 0;
+
+    frame[0][0] = 1;
+    frame[0][11] = 1;
+    frame[7][0] = 1;
+    frame[7][11] = 1;
+
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[3][0] = 0;
+    frame[3][11] = 0;
+    frame[4][0] = 0;
+    frame[4][11] = 0;
+
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[2][0] = 0;
+    frame[2][11] = 0;
+    frame[5][0] = 0;
+    frame[5][11] = 0;
+
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[1][0] = 0;
+    frame[1][11] = 0;
+    frame[6][0] = 0;
+    frame[6][11] = 0;
+
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    /*
+    frame[0][1] = 1;
+    frame[0][10] = 1;
+    frame[1][0] = 1;
+    frame[1][11] = 1;
+    frame[6][0] = 1;
+    frame[6][11] = 1;
+    frame[7][1] = 1;
+    frame[7][10] = 1;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(200);
+
+    frame[0][1] = 0;
+    frame[0][10] = 0;
+    frame[1][0] = 0;
+    frame[1][11] = 0;
+    frame[6][0] = 0;
+    frame[6][11] = 0;
+    frame[7][1] = 0;
+    frame[7][10] = 0;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+    */
+
+    frame[0][0] = 0;
+    frame[0][11] = 0;
+    frame[7][0] = 0;
+    frame[7][11] = 0;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+}
+
+void LedMatrixStartupArc()
+{
+    uint8_t frame[8][12] = {
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    };
+
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[4][2] = 0;
+    frame[4][9] = 0;
+    frame[5][3] = 0;
+    frame[5][8] = 0;
+    frame[6][4] = 0;
+    frame[6][7] = 0;
+    frame[7][5] = 0;
+    frame[7][6] = 0;
+
+    frame[3][2] = 1;
+    frame[3][3] = 1;
+    frame[3][4] = 1;
+    frame[3][5] = 1;
+    frame[3][6] = 1;
+    frame[3][7] = 1;
+    frame[3][8] = 1;
+    frame[3][9] = 1;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[4][3] = 0;
+    frame[4][8] = 0;
+    frame[5][4] = 0;
+    frame[5][7] = 0;
+    frame[6][5] = 0;
+    frame[6][6] = 0;
+
+    frame[2][3] = 1;
+    frame[2][4] = 1;
+    frame[2][5] = 1;
+    frame[2][6] = 1;
+    frame[2][7] = 1;
+    frame[2][8] = 1;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[4][4] = 0;
+    frame[4][7] = 0;
+    frame[5][5] = 0;
+    frame[5][6] = 0;
+
+    frame[1][4] = 1;
+    frame[1][5] = 1;
+    frame[1][6] = 1;
+    frame[1][7] = 1;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+
+    frame[4][5] = 0;
+    frame[4][6] = 0;
+
+    frame[0][5] = 1;
+    frame[0][6] = 1;
+    matrix.renderBitmap(frame, 8, 12);
+    delay(100);
+}
+
+void setup()
+{
+    Serial.begin(9600);
+    matrix.begin();
+    /*
+    uint8_t frame[8][12] = {
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    };
+    matrix.renderBitmap(frame, 8, 12);
+        */
+    arctic_boot();
+    LedMatrixStartup();
+}
+
+void loop()
+{
+    Serial.println(analogRead(A0));
+    delay(100);
+
+    uint8_t frame[8][12] = {
+        // deffine your starting board
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1},
+        {0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1},
+        {0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    };
+    Serial.println("Startup finnished");
+    matrix.renderBitmap(frame, 8, 12);
+    while (true)
+    {
+
+        for (int x = 0; x < 12; x++)
+        {
+            for (int y = 0; y < 8; y++)
+            {
+                if (not x < 0 || not y < 0)
+                // checks active neighbors
+                {
+                    if (frame[x - 1][y - 1] == 1)
+                    {
+                        ActiveNeighbors++;
+                    }
+                    if (frame[x - 1][y] == 1)
+                    {
+                        ActiveNeighbors++;
+                    }
+                    if (frame[x][y - 1] == 1)
+                    {
+                        ActiveNeighbors++;
+                    }
+                }
+                if (not x > 11 || not y > 7)
+                    ;
+                {
+                    if (frame[x][y + 1] == 1)
+                    {
+                        ActiveNeighbors++;
+                    }
+                    if (frame[x + 1][y] == 1)
+                    {
+                        ActiveNeighbors++;
+                    }
+                    if (frame[x + 1][y + 1] == 1)
+                    {
+                        ActiveNeighbors++;
+                    }
+                }
+                if (not x > 11 || not y > 7 && not x < 0 || not y < 0)
+                {
+                    if (frame[x + 1][y - 1] == 1)
+                    {
+                        ActiveNeighbors++;
+                    }
+                    if (frame[x - 1][y + 1] == 1)
+                    {
+                        ActiveNeighbors++;
+                    }
+                }
+
+                // checks if the cell should be active or inactive
+                // decides the fate of the cell
+                if (ActiveNeighbors == 2 || ActiveNeighbors == 3)
+                {
+                    UpdateToActiveX.push_back(x);
+                    UpdateToActiveY.push_back(y);
+                }
+                else
+                {
+                    UpdateToInactiveX.push_back(x);
+                    UpdateToInactiveY.push_back(y);
+                }
+            }
+        }
+        for (int i = 0; i < UpdateToActiveX.size(); i++)
+        {
+            frame[UpdateToActiveY[i]][UpdateToActiveX[i]] = 1;
+        }
+        for (int i = 0; i < UpdateToInactiveX.size(); i++)
+        {
+            frame[UpdateToInactiveY[i]][UpdateToInactiveX[i]] = 0;
+        }
+        UpdateToActiveX.clear();
+        UpdateToActiveY.clear();
+        UpdateToInactiveX.clear();
+        UpdateToInactiveY.clear();
+        matrix.renderBitmap(frame, 8, 12);
+        Serial.println("finnished loop");
+        delay(500);
+    }
+}
