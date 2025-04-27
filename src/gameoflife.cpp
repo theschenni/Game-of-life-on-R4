@@ -6,45 +6,133 @@
 
 ArduinoLEDMatrix matrix;
 
-int ActiveNeighbors = 0;
-
 std::vector<int> UpdateToActiveX;
 std::vector<int> UpdateToActiveY;
 std::vector<int> UpdateToInactiveX;
 std::vector<int> UpdateToInactiveY;
 
-// deffines the size of the LED matrix here: 12x8
-int maxX = 12;
-int maxY = 8;
+// defines the size of the LED matrix
+const int maxX = 12;
+const int maxY = 8;
 
-bool borderTop = false;
-bool borderLeft = false;
-bool borderLower = false;
-bool borderRight = false;
-
-void bordercheck(int x, int y, int maxX, int maxY)
+void awakeCell(int x, int y)
 {
-    if (x <= 0)
+    UpdateToActiveX.push_back(x);
+    UpdateToActiveY.push_back(y);
+}
+
+void killCell(int x, int y)
+{
+    UpdateToInactiveX.push_back(x);
+    UpdateToInactiveY.push_back(y);
+}
+
+bool isActive(int x, int y, uint8_t frame[maxY][maxX])
+{
+    return (frame[y][x]);
+}
+
+void borderCheck(int x, int y, bool *borderTop, bool *borderLeft, bool *borderRight, bool *borderBottom)
+{
+    if (x == 0)
     {
-        borderTop = true;
+        *borderTop = true;
     }
-    if (y <= 0)
+    if (y == 0)
     {
-        borderLeft = true;
+        *borderLeft = true;
     }
-    if (x + 1 <= maxX)
+    if (x + 1 == maxX)
     {
-        borderLower = true;
+        *borderBottom = true;
     }
-    if (y + 1 <= maxY)
+    if (y + 1 == maxY)
     {
-        borderRight = true;
+        *borderRight = true;
     }
 }
 
-void LedMatrixStartup()
+int neighborCheck(int x, int y, uint8_t frame[maxY][maxX])
 {
-    uint8_t frame[8][12] = {
+    bool borderTop = false;
+    bool borderLeft = false;
+    bool borderBottom = false;
+    bool borderRight = false;
+
+    int activeNeighbors = 0;
+
+    borderCheck(x, y, &borderTop, &borderLeft, &borderRight, &borderBottom);
+    // printf("Coord:[%d, %d] %d %d %d %d\n", x, y, borderTop, borderLeft, borderRight, borderBottom);
+
+    if (!borderTop)
+    {
+        if (frame[y - 1][x] == 1)
+        {
+            activeNeighbors++;
+        }
+    }
+
+    if (!borderTop && !borderLeft)
+    {
+        if (frame[y - 1][x - 1] == 1)
+        {
+            activeNeighbors++;
+        }
+    }
+
+    if (!borderLeft)
+    {
+        if (frame[y][x - 1] == 1)
+        {
+            activeNeighbors++;
+        }
+    }
+
+    if (!borderLeft && !borderBottom)
+    {
+        if (frame[y + 1][x - 1] == 1)
+        {
+            activeNeighbors++;
+        }
+    }
+
+    if (!borderBottom)
+    {
+        if (frame[y + 1][x] == 1)
+        {
+            activeNeighbors++;
+        }
+    }
+
+    if (!borderBottom && !borderRight)
+    {
+        if (frame[y + 1][x + 1] == 1)
+        {
+            activeNeighbors++;
+        }
+    }
+
+    if (!borderRight)
+    {
+        if (frame[y][x + 1] == 1)
+        {
+            activeNeighbors++;
+        }
+    }
+
+    if (!borderRight && !borderTop)
+    {
+        if (frame[y - 1][x + 1] == 1)
+        {
+            activeNeighbors++;
+        }
+    }
+    return (activeNeighbors);
+}
+
+void ledMatrixStartup()
+{
+    uint8_t frame[maxY][maxX] = {
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -65,21 +153,21 @@ void LedMatrixStartup()
         ]
     */
 
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[0][0] = 1;
     frame[0][11] = 1;
     frame[7][0] = 1;
     frame[7][11] = 1;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[0][1] = 1;
     frame[0][10] = 1;
     frame[7][1] = 1;
     frame[7][10] = 1;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[0][0] = 0;
@@ -91,7 +179,7 @@ void LedMatrixStartup()
     frame[0][9] = 1;
     frame[7][2] = 1;
     frame[7][9] = 1;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[0][1] = 0;
@@ -103,7 +191,7 @@ void LedMatrixStartup()
     frame[0][8] = 1;
     frame[7][3] = 1;
     frame[7][8] = 1;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[0][2] = 0;
@@ -115,7 +203,7 @@ void LedMatrixStartup()
     frame[0][7] = 1;
     frame[7][4] = 1;
     frame[7][7] = 1;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[0][3] = 0;
@@ -127,7 +215,7 @@ void LedMatrixStartup()
     frame[0][6] = 1;
     frame[7][5] = 1;
     frame[7][6] = 1;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[0][4] = 0;
@@ -139,7 +227,7 @@ void LedMatrixStartup()
     frame[1][6] = 1;
     frame[6][5] = 1;
     frame[6][6] = 1;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[0][5] = 0;
@@ -151,7 +239,7 @@ void LedMatrixStartup()
     frame[2][6] = 1;
     frame[5][5] = 1;
     frame[5][6] = 1;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[1][5] = 0;
@@ -163,14 +251,14 @@ void LedMatrixStartup()
     frame[3][6] = 1;
     frame[4][5] = 1;
     frame[4][6] = 1;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[2][5] = 0;
     frame[2][6] = 0;
     frame[5][5] = 0;
     frame[5][6] = 0;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[3][5] = 0;
@@ -186,7 +274,7 @@ void LedMatrixStartup()
     frame[4][7] = 1;
     frame[5][5] = 1;
     frame[5][6] = 1;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[2][5] = 0;
@@ -210,7 +298,7 @@ void LedMatrixStartup()
     frame[5][7] = 1;
     frame[6][5] = 1;
     frame[6][6] = 1;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[1][5] = 0;
@@ -243,7 +331,7 @@ void LedMatrixStartup()
     frame[7][5] = 1;
     frame[7][6] = 1;
 
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[0][5] = 0;
@@ -280,7 +368,7 @@ void LedMatrixStartup()
     frame[7][4] = 1;
     frame[7][7] = 1;
 
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[0][4] = 0;
@@ -317,7 +405,7 @@ void LedMatrixStartup()
     frame[7][3] = 1;
     frame[7][8] = 1;
 
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[0][3] = 0;
@@ -346,7 +434,7 @@ void LedMatrixStartup()
     frame[7][2] = 1;
     frame[7][9] = 1;
 
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[0][2] = 0;
@@ -367,7 +455,7 @@ void LedMatrixStartup()
     frame[7][1] = 1;
     frame[7][10] = 1;
 
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[0][1] = 0;
@@ -380,7 +468,7 @@ void LedMatrixStartup()
     frame[7][0] = 1;
     frame[7][11] = 1;
 
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[3][0] = 0;
@@ -388,7 +476,7 @@ void LedMatrixStartup()
     frame[4][0] = 0;
     frame[4][11] = 0;
 
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[2][0] = 0;
@@ -396,7 +484,7 @@ void LedMatrixStartup()
     frame[5][0] = 0;
     frame[5][11] = 0;
 
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[1][0] = 0;
@@ -404,7 +492,7 @@ void LedMatrixStartup()
     frame[6][0] = 0;
     frame[6][11] = 0;
 
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     /*
@@ -416,7 +504,7 @@ void LedMatrixStartup()
     frame[6][11] = 1;
     frame[7][1] = 1;
     frame[7][10] = 1;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(200);
 
     frame[0][1] = 0;
@@ -427,7 +515,7 @@ void LedMatrixStartup()
     frame[6][11] = 0;
     frame[7][1] = 0;
     frame[7][10] = 0;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
     */
 
@@ -435,11 +523,11 @@ void LedMatrixStartup()
     frame[0][11] = 0;
     frame[7][0] = 0;
     frame[7][11] = 0;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 }
 
-void LedMatrixStartupArc()
+void ledMatrixStartupArc()
 {
     uint8_t frame[8][12] = {
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -452,7 +540,7 @@ void LedMatrixStartupArc()
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
     };
 
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[4][2] = 0;
@@ -472,7 +560,7 @@ void LedMatrixStartupArc()
     frame[3][7] = 1;
     frame[3][8] = 1;
     frame[3][9] = 1;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[4][3] = 0;
@@ -488,7 +576,7 @@ void LedMatrixStartupArc()
     frame[2][6] = 1;
     frame[2][7] = 1;
     frame[2][8] = 1;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[4][4] = 0;
@@ -500,7 +588,7 @@ void LedMatrixStartupArc()
     frame[1][5] = 1;
     frame[1][6] = 1;
     frame[1][7] = 1;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 
     frame[4][5] = 0;
@@ -508,7 +596,7 @@ void LedMatrixStartupArc()
 
     frame[0][5] = 1;
     frame[0][6] = 1;
-    matrix.renderBitmap(frame, 8, 12);
+    matrix.renderBitmap(frame, maxY, maxX);
     delay(100);
 }
 
@@ -527,77 +615,71 @@ void setup()
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
     };
-    matrix.renderBitmap(frame, 8, 12);
-        */
+    matrix.renderBitmap(frame, maxY, maxX);
     arctic_boot();
-    LedMatrixStartup();
+    ledMatrixStartup();
+    */
 }
 
 void loop()
 {
-    Serial.println(analogRead(A0));
-    delay(100);
-
-    uint8_t frame[8][12] = {
+    uint8_t frame[maxY][maxX] = {
         // deffine your starting board
+        {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1},
-        {0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1},
-        {0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     };
-    Serial.println("Startup finnished");
-    matrix.renderBitmap(frame, 8, 12);
+    Serial.println("Startup finished");
+    matrix.renderBitmap(frame, maxY, maxX);
 
     while (true)
     {
-
+        delay(500);
         for (int x = 0; x < maxX; x++)
         {
             for (int y = 0; y < maxY; y++)
             {
-                if (not x < 0 || not y < 0)
                 // checks active neighbors
-                {
-                    bordercheck(x, y, maxX, maxY);
+                int activeNeighbors = neighborCheck(x, y, frame);
+                bool cellState = isActive(x, y, frame);
 
-                    // checks if the cell should be active or inactive
-                    // decides the fate of the cell
-                    if (ActiveNeighbors == 2 || ActiveNeighbors == 3)
+                if (cellState)
+                {
+                    if (activeNeighbors == 2 || activeNeighbors == 3)
                     {
-                        UpdateToActiveX.push_back(x);
-                        UpdateToActiveY.push_back(y);
+                        awakeCell(x, y);
                     }
                     else
                     {
-                        UpdateToInactiveX.push_back(x);
-                        UpdateToInactiveY.push_back(y);
+                        killCell(x, y);
                     }
-
-                    bool borderTop = false;
-                    bool borderLeft = false;
-                    bool borderLower = false;
-                    bool borderRight = false;
+                }
+                else
+                {
+                    if (activeNeighbors == 3)
+                    {
+                        awakeCell(x, y);
+                    }
                 }
             }
-            for (int i = 0; i < UpdateToActiveX.size(); i++)
-            {
-                frame[UpdateToActiveY[i]][UpdateToActiveX[i]] = 1;
-            }
-            for (int i = 0; i < UpdateToInactiveX.size(); i++)
-            {
-                frame[UpdateToInactiveY[i]][UpdateToInactiveX[i]] = 0;
-            }
-            UpdateToActiveX.clear();
-            UpdateToActiveY.clear();
-            UpdateToInactiveX.clear();
-            UpdateToInactiveY.clear();
-            matrix.renderBitmap(frame, 8, 12);
-            Serial.println("finnished loop");
-            delay(500);
         }
+        for (int i = 0; i < UpdateToActiveX.size(); i++)
+        {
+            frame[UpdateToActiveY[i]][UpdateToActiveX[i]] = 1;
+        }
+        for (int i = 0; i < UpdateToInactiveX.size(); i++)
+        {
+            frame[UpdateToInactiveY[i]][UpdateToInactiveX[i]] = 0;
+        }
+        UpdateToActiveX.clear();
+        UpdateToActiveY.clear();
+        UpdateToInactiveX.clear();
+        UpdateToInactiveY.clear();
+        matrix.renderBitmap(frame, maxY, maxX);
     }
 }
