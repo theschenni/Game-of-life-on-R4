@@ -522,18 +522,19 @@ void loop()
     };
     Serial.println("Startup finnished");
     matrix.renderBitmap(frame, 8, 12);
+    /*
     while (true)
     {
 
-        for (int x = 0; x < 12; x++)
+    for (int x = 0; x < 12; x++)
+    {
+        for (int y = 0; y < 8; y++)
         {
-            for (int y = 0; y < 8; y++)
+            if (not x < 0 || not y < 0)
+            // checks active neighbors
             {
-                if (not x < 0 || not y < 0)
-                // checks active neighbors
+                if (frame[x - 1][y - 1] == 1)
                 {
-                    if (frame[x - 1][y - 1] == 1)
-                    {
                         ActiveNeighbors++;
                     }
                     if (frame[x - 1][y] == 1)
@@ -546,7 +547,6 @@ void loop()
                     }
                 }
                 if (not x > 11 || not y > 7)
-                    ;
                 {
                     if (frame[x][y + 1] == 1)
                     {
@@ -603,4 +603,5 @@ void loop()
         Serial.println("finnished loop");
         delay(500);
     }
+    */
 }
