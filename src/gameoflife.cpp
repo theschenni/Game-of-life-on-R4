@@ -13,6 +13,35 @@ std::vector<int> UpdateToActiveY;
 std::vector<int> UpdateToInactiveX;
 std::vector<int> UpdateToInactiveY;
 
+// deffines the size of the LED matrix here: 12x8
+int maxX = 12;
+int maxY = 8;
+
+bool borderTop = false;
+bool borderLeft = false;
+bool borderLower = false;
+bool borderRight = false;
+
+void bordercheck(int x, int y, int maxX, int maxY)
+{
+    if (x <= 0)
+    {
+        borderTop = true;
+    }
+    if (y <= 0)
+    {
+        borderLeft = true;
+    }
+    if (x + 1 <= maxX)
+    {
+        borderLower = true;
+    }
+    if (y + 1 <= maxY)
+    {
+        borderRight = true;
+    }
+}
+
 void LedMatrixStartup()
 {
     uint8_t frame[8][12] = {
@@ -526,13 +555,14 @@ void loop()
     while (true)
     {
 
-        for (int x = 0; x < 12; x++)
+        for (int x = 0; x < maxX; x++)
         {
-            for (int y = 0; y < 8; y++)
+            for (int y = 0; y < maxY; y++)
             {
                 if (not x < 0 || not y < 0)
                 // checks active neighbors
                 {
+                    bordercheck(x, y, maxX, maxY);
 
                     // checks if the cell should be active or inactive
                     // decides the fate of the cell
@@ -546,6 +576,11 @@ void loop()
                         UpdateToInactiveX.push_back(x);
                         UpdateToInactiveY.push_back(y);
                     }
+
+                    bool borderTop = false;
+                    bool borderLeft = false;
+                    bool borderLower = false;
+                    bool borderRight = false;
                 }
             }
             for (int i = 0; i < UpdateToActiveX.size(); i++)
@@ -565,3 +600,4 @@ void loop()
             delay(500);
         }
     }
+}
