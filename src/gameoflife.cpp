@@ -624,7 +624,7 @@ void setup()
 void loop()
 {
     uint8_t frame[maxY][maxX] = {
-        // deffine your starting board
+        // define your starting board
         {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
