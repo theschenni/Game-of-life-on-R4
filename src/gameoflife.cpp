@@ -522,86 +522,46 @@ void loop()
     };
     Serial.println("Startup finnished");
     matrix.renderBitmap(frame, 8, 12);
-    /*
+
     while (true)
     {
 
-    for (int x = 0; x < 12; x++)
-    {
-        for (int y = 0; y < 8; y++)
+        for (int x = 0; x < 12; x++)
         {
-            if (not x < 0 || not y < 0)
-            // checks active neighbors
+            for (int y = 0; y < 8; y++)
             {
-                if (frame[x - 1][y - 1] == 1)
+                if (not x < 0 || not y < 0)
+                // checks active neighbors
                 {
-                        ActiveNeighbors++;
-                    }
-                    if (frame[x - 1][y] == 1)
-                    {
-                        ActiveNeighbors++;
-                    }
-                    if (frame[x][y - 1] == 1)
-                    {
-                        ActiveNeighbors++;
-                    }
-                }
-                if (not x > 11 || not y > 7)
-                {
-                    if (frame[x][y + 1] == 1)
-                    {
-                        ActiveNeighbors++;
-                    }
-                    if (frame[x + 1][y] == 1)
-                    {
-                        ActiveNeighbors++;
-                    }
-                    if (frame[x + 1][y + 1] == 1)
-                    {
-                        ActiveNeighbors++;
-                    }
-                }
-                if (not x > 11 || not y > 7 && not x < 0 || not y < 0)
-                {
-                    if (frame[x + 1][y - 1] == 1)
-                    {
-                        ActiveNeighbors++;
-                    }
-                    if (frame[x - 1][y + 1] == 1)
-                    {
-                        ActiveNeighbors++;
-                    }
-                }
 
-                // checks if the cell should be active or inactive
-                // decides the fate of the cell
-                if (ActiveNeighbors == 2 || ActiveNeighbors == 3)
-                {
-                    UpdateToActiveX.push_back(x);
-                    UpdateToActiveY.push_back(y);
-                }
-                else
-                {
-                    UpdateToInactiveX.push_back(x);
-                    UpdateToInactiveY.push_back(y);
+                    // checks if the cell should be active or inactive
+                    // decides the fate of the cell
+                    if (ActiveNeighbors == 2 || ActiveNeighbors == 3)
+                    {
+                        UpdateToActiveX.push_back(x);
+                        UpdateToActiveY.push_back(y);
+                    }
+                    else
+                    {
+                        UpdateToInactiveX.push_back(x);
+                        UpdateToInactiveY.push_back(y);
+                    }
                 }
             }
+            for (int i = 0; i < UpdateToActiveX.size(); i++)
+            {
+                frame[UpdateToActiveY[i]][UpdateToActiveX[i]] = 1;
+            }
+            for (int i = 0; i < UpdateToInactiveX.size(); i++)
+            {
+                frame[UpdateToInactiveY[i]][UpdateToInactiveX[i]] = 0;
+            }
+            UpdateToActiveX.clear();
+            UpdateToActiveY.clear();
+            UpdateToInactiveX.clear();
+            UpdateToInactiveY.clear();
+            matrix.renderBitmap(frame, 8, 12);
+            Serial.println("finnished loop");
+            delay(500);
         }
-        for (int i = 0; i < UpdateToActiveX.size(); i++)
-        {
-            frame[UpdateToActiveY[i]][UpdateToActiveX[i]] = 1;
-        }
-        for (int i = 0; i < UpdateToInactiveX.size(); i++)
-        {
-            frame[UpdateToInactiveY[i]][UpdateToInactiveX[i]] = 0;
-        }
-        UpdateToActiveX.clear();
-        UpdateToActiveY.clear();
-        UpdateToInactiveX.clear();
-        UpdateToInactiveY.clear();
-        matrix.renderBitmap(frame, 8, 12);
-        Serial.println("finnished loop");
-        delay(500);
     }
-    */
-}
