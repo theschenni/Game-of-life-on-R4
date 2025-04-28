@@ -1,1 +1,0 @@
-void arctic_boot();
