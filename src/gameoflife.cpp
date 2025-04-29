@@ -40,11 +40,11 @@ void borderCheck(int x, int y, bool *borderTop, bool *borderLeft, bool *borderRi
     {
         *borderLeft = true;
     }
-    if (x + 1 == maxX)
+    if (x == maxX)
     {
         *borderBottom = true;
     }
-    if (y + 1 == maxY)
+    if (y == maxY)
     {
         *borderRight = true;
     }
