@@ -9,6 +9,12 @@ std::vector<int> UpdateToActiveY;
 std::vector<int> UpdateToInactiveX;
 std::vector<int> UpdateToInactiveY;
 
+// stores the current seed for later use (not yet used later)
+int currentSeed;
+
+// toggle the start to be random
+const bool randomStart = true;
+
 // defines the size of the LED matrix
 const int maxX = 12;
 const int maxY = 8;
@@ -132,21 +138,33 @@ void setup()
 {
     Serial.begin(9600);
     matrix.begin();
+    currentSeed = analogRead(0);
 }
 
 void loop()
 {
+    randomSeed(currentSeed);
+
     uint8_t frame[maxY][maxX] = {
         // define your starting board
-        {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     };
+
+    for (int y = 0; y < maxY; y++)
+    {
+        for (int x = 0; x < maxX; x++)
+        {
+            frame[y][x] = random(2);
+        }
+    }
+
     Serial.println("Startup finished");
     matrix.renderBitmap(frame, maxY, maxX);
 
