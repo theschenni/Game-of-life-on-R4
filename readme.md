@@ -21,11 +21,11 @@ Even if it only offers 96 pixels(cells) to work with you can still make stuff, l
 ### 1. Random Start toggle
 
 You can toggle the random start function by changin the random start variable
-```
+```c++
 const bool randomStart = true;
 ```
 or
-```
+```c++
 const bool randomStart = false;
 ```
 
@@ -33,7 +33,7 @@ const bool randomStart = false;
 ### 2. Define set starting board
 
 You are able to change the first frame configuration by changing the numbers (1 = alive, 0 = dead) on line 148
-```
+```c++
     uint8_t frame[maxY][maxX] = {
         // define your starting board
         {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
