@@ -16,8 +16,6 @@ Even if it only offers 96 pixels(cells) to work with you can still make stuff, l
 
 # Settings
 
-<br>
-
 ## Start settings
 
 ### 1. Random Start toggle
