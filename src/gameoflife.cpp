@@ -181,11 +181,7 @@ void loop()
 
                 if (cellState)
                 {
-                    if (activeNeighbors == 2 || activeNeighbors == 3)
-                    {
-                        awakeCell(x, y);
-                    }
-                    else
+                    if (activeNeighbors != 2 || activeNeighbors != 3)
                     {
                         killCell(x, y);
                     }
