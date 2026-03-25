@@ -3,7 +3,7 @@
 
 This is a small project to be a able to "play" [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) on the Arduino UNO R4's 12x8 LED matrix.
 
-Even if it only offers 96 pixels(cells) to work with you can still make stuff, like a glider (a small group of cells able to move diagonally on the grid), which is the default here.
+Even if it only offers 96 pixels(cells) to work with you can still make stuff, like a glider (a small group of cells able to move diagonally on the grid), which is the default here, when random start is turned off.
 
 ## The rules:
 1. Any live cell with fewer than two live neighbours dies, as if by underpopulation.
